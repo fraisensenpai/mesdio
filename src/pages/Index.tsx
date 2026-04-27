@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Trophy } from "lucide-react";
+import { Link } from "react-router-dom";
+
 import { QuizProgress } from "@/components/quiz/QuizProgress";
 import { QuestionCard } from "@/components/quiz/QuestionCard";
 import { CalculatingScreen } from "@/components/quiz/CalculatingScreen";
@@ -209,36 +211,37 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicRes
 
       <div className="mt-8 space-y-4 text-left max-w-xs mx-auto">
         <div className="space-y-1.5">
-          <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">İsim</Label>
+          <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">First Name</Label>
           <Input 
             id="name" 
-            placeholder="İsminiz" 
+            placeholder="Your name" 
             className="rounded-xl border-border bg-background focus:ring-primary h-12"
             value={userInfo.name}
             onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="surname" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Soyisim</Label>
+          <Label htmlFor="surname" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Last Name</Label>
           <Input 
             id="surname" 
-            placeholder="Soyisminiz" 
+            placeholder="Your surname" 
             className="rounded-xl border-border bg-background focus:ring-primary h-12"
             value={userInfo.surname}
             onChange={(e) => setUserInfo({ ...userInfo, surname: e.target.value })}
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="class" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Sınıf</Label>
+          <Label htmlFor="class" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Class</Label>
           <Input 
             id="class" 
-            placeholder="Örn: 9-A" 
+            placeholder="e.g. 9-A" 
             className="rounded-xl border-border bg-background focus:ring-primary h-12"
             value={userInfo.className}
             onChange={(e) => setUserInfo({ ...userInfo, className: e.target.value })}
           />
         </div>
       </div>
+
 
       <button
         onClick={onStart}
@@ -254,25 +257,29 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicRes
       {publicResults.length > 0 && (
         <div className="mt-12 text-left">
           <div className="flex items-center justify-between mb-4 px-1">
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">Son Sonuçlar</h3>
-            <span className="w-full h-[1px] bg-border ml-4"></span>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">Recent Matches</h3>
+            <Link to="/results" className="inline-flex items-center gap-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-primary hover:opacity-80 transition-opacity">
+              <Trophy className="w-3 h-3" />
+              View Hall of Fame
+            </Link>
           </div>
           <div className="space-y-3">
             {publicResults.map((res: any, idx: number) => (
               <div key={res.id || idx} className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/50 border border-border/50">
                 <div className="flex flex-col">
                   <span className="font-display font-bold text-sm text-foreground">{res.name} {res.surname}</span>
-                  <span className="font-body text-[0.65rem] text-muted-foreground uppercase tracking-wider">{res.class_name}</span>
+                  <span className="font-body text-[0.65rem] text-muted-foreground uppercase tracking-wider">Class {res.class_name}</span>
                 </div>
                 <div className="flex flex-col items-end">
                   <span className="font-display font-extrabold text-primary text-sm">{res.top_match}</span>
-                  <span className="font-body text-[0.65rem] text-muted-foreground">%{res.percentage} Eşleşme</span>
+                  <span className="font-body text-[0.65rem] text-muted-foreground">{res.percentage}% Match</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
       )}
+
     </div>
   </motion.div>
 );
