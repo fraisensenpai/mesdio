@@ -173,11 +173,14 @@ const Index = () => {
       </section>
 
       {/* Footer hint */}
-      <footer className="shrink-0 px-5 sm:px-8 pb-5 sm:pb-7 text-center">
+      <footer className="shrink-0 px-5 sm:px-8 pb-5 sm:pb-7 text-center space-y-2">
         <p className="font-body text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground/70">
           {stage === "intro" && `${TEACHERS.length} teachers · ${totalQuestions} questions · ~2 min`}
           {stage === "quiz" && "Tap an answer to continue"}
           {stage === "calculating" && "Almost there"}
+        </p>
+        <p className="font-display text-[0.6rem] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+          Made by <span className="text-primary/70">FraisenSenpai</span> with ❤️
         </p>
       </footer>
     </main>
