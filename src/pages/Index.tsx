@@ -209,7 +209,7 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicRes
       </span>
 
       <h1 className="font-display text-[2.4rem] sm:text-[3.4rem] font-extrabold leading-[1.02] text-foreground text-balance">
-        Which teacher are <br className="hidden sm:block" />you most like?
+        Which teacher do <br className="hidden sm:block" />you resemble?
       </h1>
 
       <div className="mt-8 space-y-4 text-left max-w-xs mx-auto">
