@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import { QuizProgress } from "@/components/quiz/QuizProgress";
@@ -19,6 +20,23 @@ const Index = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [scores, setScores] = useState<ScoreMap>({});
   const [userInfo, setUserInfo] = useState({ name: "", surname: "", className: "" });
+  const [publicResults, setPublicResults] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      const { data, error } = await supabase
+        .from("quiz_results")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      
+      if (data) setPublicResults(data);
+      if (error) console.error("Error fetching public results:", error);
+    };
+
+    fetchResults();
+  }, [stage]);
+
 
 
   const totalQuestions = QUESTIONS.length;
@@ -136,7 +154,9 @@ const Index = () => {
               totalQuestions={totalQuestions} 
               userInfo={userInfo}
               setUserInfo={setUserInfo}
+              publicResults={publicResults}
             />
+
           )}
           {stage === "quiz" && (
             <QuestionCard
@@ -162,11 +182,12 @@ const Index = () => {
   );
 };
 
-const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo }: { 
+const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicResults }: { 
   onStart: () => void; 
   totalQuestions: number;
   userInfo: { name: string; surname: string; className: string };
   setUserInfo: (val: any) => void;
+  publicResults: any[];
 }) => (
   <motion.div
     key="intro"
@@ -176,7 +197,7 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo }: {
     transition={{ type: "spring", stiffness: 200, damping: 22 }}
     className="w-full max-w-xl mx-auto text-center"
   >
-    <div className="rounded-[2rem] bg-surface border border-border shadow-soft-md p-8 sm:p-12">
+    <div className="rounded-[2rem] bg-surface border border-border shadow-soft-md p-8 sm:p-12 overflow-y-auto max-h-[85vh]">
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-body text-[0.7rem] font-bold uppercase tracking-[0.14em] mb-5">
         <Sparkles className="w-3 h-3" />
         Mesdio Personality Quiz
@@ -222,16 +243,40 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo }: {
       <button
         onClick={onStart}
         disabled={!userInfo.name || !userInfo.surname || !userInfo.className}
-        className="mt-8 group inline-flex items-center gap-2.5 pl-7 pr-5 py-4 rounded-2xl bg-foreground text-background font-body font-semibold text-base shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-[transform,box-shadow] duration-200 ease-spring disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-8 group inline-flex items-center gap-2.5 pl-7 pr-5 py-4 rounded-2xl bg-foreground text-background font-body font-semibold text-base shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-[transform,box-shadow] duration-200 ease-spring disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center"
       >
         Start the quiz
-        <span className="w-7 h-7 rounded-xl bg-background/15 grid place-items-center group-hover:translate-x-0.5 transition-transform">
+        <span className="w-7 h-7 rounded-xl bg-background/15 grid place-items-center group-hover:translate-x-0.5 transition-transform ml-2">
           <ArrowRight className="w-4 h-4" />
         </span>
       </button>
+
+      {publicResults.length > 0 && (
+        <div className="mt-12 text-left">
+          <div className="flex items-center justify-between mb-4 px-1">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">Son Sonuçlar</h3>
+            <span className="w-full h-[1px] bg-border ml-4"></span>
+          </div>
+          <div className="space-y-3">
+            {publicResults.map((res: any, idx: number) => (
+              <div key={res.id || idx} className="flex items-center justify-between p-3.5 rounded-xl bg-secondary/50 border border-border/50">
+                <div className="flex flex-col">
+                  <span className="font-display font-bold text-sm text-foreground">{res.name} {res.surname}</span>
+                  <span className="font-body text-[0.65rem] text-muted-foreground uppercase tracking-wider">{res.class_name}</span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="font-display font-extrabold text-primary text-sm">{res.top_match}</span>
+                  <span className="font-body text-[0.65rem] text-muted-foreground">%{res.percentage} Eşleşme</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   </motion.div>
 );
+
 
 
 export default Index;
