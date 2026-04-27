@@ -6,6 +6,10 @@ import { QuestionCard } from "@/components/quiz/QuestionCard";
 import { CalculatingScreen } from "@/components/quiz/CalculatingScreen";
 import { ResultsView } from "@/components/quiz/ResultsView";
 import { QUESTIONS, TEACHERS, computeResults, type ScoreMap } from "@/data/quiz";
+import { supabase } from "@/lib/supabase";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 
 type Stage = "intro" | "quiz" | "calculating" | "results";
 
@@ -14,6 +18,8 @@ const Index = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [scores, setScores] = useState<ScoreMap>({});
+  const [userInfo, setUserInfo] = useState({ name: "", surname: "", className: "" });
+
 
   const totalQuestions = QUESTIONS.length;
   const currentQuestion = QUESTIONS[questionIndex];
@@ -45,13 +51,35 @@ const Index = () => {
       const isLast = questionIndex >= totalQuestions - 1;
       if (isLast) {
         setScores(next);
+        const finalResults = computeResults(next);
         setStage("calculating");
+        
+        // Send to Supabase
+        const sendData = async () => {
+          try {
+            await supabase.from("quiz_results").insert([
+              {
+                name: userInfo.name,
+                surname: userInfo.surname,
+                class_name: userInfo.className,
+                top_match: finalResults[0].teacher.name,
+                percentage: finalResults[0].percentage,
+                all_results: finalResults,
+              },
+            ]);
+          } catch (error) {
+            console.error("Error sending to Supabase:", error);
+          }
+        };
+        sendData();
+
         window.setTimeout(() => setStage("results"), 1600);
       } else {
         setScores(next);
         setQuestionIndex((i) => i + 1);
         setSelectedId(null);
       }
+
     }, 380);
   };
 
@@ -78,10 +106,8 @@ const Index = () => {
       <header className="shrink-0 px-5 sm:px-8 pt-5 sm:pt-6">
         <div className="max-w-xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2 font-display font-bold text-foreground">
-            <span className="w-7 h-7 rounded-lg bg-gradient-hero grid place-items-center text-primary-foreground">
-              <Sparkles className="w-3.5 h-3.5" />
-            </span>
-            <span className="text-[0.95rem] tracking-tight">Teacher Match</span>
+            <img src="/mesdio.jpeg" alt="Mesdio Logo" className="w-8 h-8 rounded-lg object-cover" />
+            <span className="text-[1.1rem] tracking-tight">Mesdio</span>
           </div>
           {stage === "quiz" && (
             <button
@@ -103,7 +129,15 @@ const Index = () => {
       {/* Center stage */}
       <section className="flex-1 flex items-center justify-center px-5 sm:px-8 py-6">
         <AnimatePresence mode="wait">
-          {stage === "intro" && <IntroScreen key="intro" onStart={handleStart} totalQuestions={totalQuestions} />}
+          {stage === "intro" && (
+            <IntroScreen 
+              key="intro" 
+              onStart={handleStart} 
+              totalQuestions={totalQuestions} 
+              userInfo={userInfo}
+              setUserInfo={setUserInfo}
+            />
+          )}
           {stage === "quiz" && (
             <QuestionCard
               key={currentQuestion.id}
@@ -128,7 +162,12 @@ const Index = () => {
   );
 };
 
-const IntroScreen = ({ onStart, totalQuestions }: { onStart: () => void; totalQuestions: number }) => (
+const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo }: { 
+  onStart: () => void; 
+  totalQuestions: number;
+  userInfo: { name: string; surname: string; className: string };
+  setUserInfo: (val: any) => void;
+}) => (
   <motion.div
     key="intro"
     initial={{ opacity: 0, y: 30, scale: 0.97 }}
@@ -140,20 +179,50 @@ const IntroScreen = ({ onStart, totalQuestions }: { onStart: () => void; totalQu
     <div className="rounded-[2rem] bg-surface border border-border shadow-soft-md p-8 sm:p-12">
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-body text-[0.7rem] font-bold uppercase tracking-[0.14em] mb-5">
         <Sparkles className="w-3 h-3" />
-        Personality Quiz
+        Mesdio Personality Quiz
       </span>
 
       <h1 className="font-display text-[2.4rem] sm:text-[3.4rem] font-extrabold leading-[1.02] text-foreground text-balance">
         Which teacher are <br className="hidden sm:block" />you most like?
       </h1>
 
-      <p className="mt-5 font-body text-base sm:text-lg text-muted-foreground leading-relaxed text-pretty max-w-md mx-auto">
-        {totalQuestions} quick questions. One uncomfortably accurate match. No wrong answers — just the one that sounds most like you.
-      </p>
+      <div className="mt-8 space-y-4 text-left max-w-xs mx-auto">
+        <div className="space-y-1.5">
+          <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">İsim</Label>
+          <Input 
+            id="name" 
+            placeholder="İsminiz" 
+            className="rounded-xl border-border bg-background focus:ring-primary h-12"
+            value={userInfo.name}
+            onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="surname" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Soyisim</Label>
+          <Input 
+            id="surname" 
+            placeholder="Soyisminiz" 
+            className="rounded-xl border-border bg-background focus:ring-primary h-12"
+            value={userInfo.surname}
+            onChange={(e) => setUserInfo({ ...userInfo, surname: e.target.value })}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="class" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Sınıf</Label>
+          <Input 
+            id="class" 
+            placeholder="Örn: 9-A" 
+            className="rounded-xl border-border bg-background focus:ring-primary h-12"
+            value={userInfo.className}
+            onChange={(e) => setUserInfo({ ...userInfo, className: e.target.value })}
+          />
+        </div>
+      </div>
 
       <button
         onClick={onStart}
-        className="mt-8 group inline-flex items-center gap-2.5 pl-7 pr-5 py-4 rounded-2xl bg-foreground text-background font-body font-semibold text-base shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-[transform,box-shadow] duration-200 ease-spring"
+        disabled={!userInfo.name || !userInfo.surname || !userInfo.className}
+        className="mt-8 group inline-flex items-center gap-2.5 pl-7 pr-5 py-4 rounded-2xl bg-foreground text-background font-body font-semibold text-base shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-[transform,box-shadow] duration-200 ease-spring disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Start the quiz
         <span className="w-7 h-7 rounded-xl bg-background/15 grid place-items-center group-hover:translate-x-0.5 transition-transform">
@@ -163,5 +232,6 @@ const IntroScreen = ({ onStart, totalQuestions }: { onStart: () => void; totalQu
     </div>
   </motion.div>
 );
+
 
 export default Index;

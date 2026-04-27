@@ -1,14 +1,11 @@
 /**
- * Data layer for the Teacher Match Quiz.
+ * Data layer for the Mesdio Quiz.
  *
  * The shape of these types mirrors the intended Supabase schema:
  *   - teachers (id, name, image_url)
  *   - questions (id, question_text)
  *   - answers (id, question_id, answer_text)
  *   - answer_weights (id, answer_id, teacher_id, weight)
- *
- * When Lovable Cloud is enabled, replace the in-memory arrays below with
- * Supabase queries — no other file needs to change.
  */
 
 export type Teacher = {

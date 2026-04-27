@@ -12,10 +12,10 @@ export const ResultsView = ({ results, onRestart }: Props) => {
   const rest = results.slice(1);
 
   const handleShare = async () => {
-    const text = `I'm most like ${top.teacher.name} (${top.percentage}%) on the Teacher Match Quiz!`;
+    const text = `I'm most like ${top.teacher.name} (${top.percentage}%) on the Mesdio Quiz!`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Teacher Match Quiz", text });
+        await navigator.share({ title: "Mesdio Quiz", text });
       } catch {
         /* user cancelled */
       }
