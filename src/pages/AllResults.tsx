@@ -104,7 +104,7 @@ export default function AllResults() {
 
         <footer className="mt-16 text-center">
           <p className="font-display text-[0.6rem] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
-            Made by <span className="text-primary/70">FraisenSenpai</span> with ❤️
+            made by <span className="text-primary/70">selvi nisa</span> with ❤️
           </p>
         </footer>
       </div>
