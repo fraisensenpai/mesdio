@@ -113,8 +113,15 @@ const Index = () => {
   // Results: scrollable layout
   if (stage === "results") {
     return (
-      <main className="min-h-[100dvh] w-full">
-        <ResultsView results={results} onRestart={handleRestart} />
+      <main className="min-h-[100dvh] w-full flex flex-col">
+        <div className="flex-1">
+          <ResultsView results={results} onRestart={handleRestart} />
+        </div>
+        <footer className="shrink-0 px-5 sm:px-8 pb-4 sm:pb-5 text-center space-y-1">
+          <p className="font-display text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+            made by <span className="text-primary/70">selvi nisa</span> with ❤️
+          </p>
+        </footer>
       </main>
     );
   }
@@ -123,11 +130,11 @@ const Index = () => {
   return (
     <main className="h-[100dvh] w-full flex flex-col overflow-hidden">
       {/* Top bar */}
-      <header className="shrink-0 px-5 sm:px-8 pt-5 sm:pt-6">
+      <header className="shrink-0 px-5 sm:px-8 pt-4 sm:pt-5">
         <div className="max-w-xl mx-auto flex items-center justify-between">
           <div className="inline-flex items-center gap-2 font-display font-bold text-foreground">
-            <img src="/mesdio.jpeg" alt="Mesdio Logo" className="w-8 h-8 rounded-lg object-cover" />
-            <span className="text-[1.1rem] tracking-tight">Mesdio</span>
+            <img src="/mesdio.jpeg" alt="Mesdio Logo" className="w-7 h-7 rounded-lg object-cover" />
+            <span className="text-[1rem] tracking-tight">Mesdio</span>
           </div>
           {stage === "quiz" && (
             <button
@@ -140,7 +147,7 @@ const Index = () => {
         </div>
 
         {stage === "quiz" && (
-          <div className="mt-5 sm:mt-6">
+          <div className="mt-4 sm:mt-5">
             <QuizProgress current={questionIndex + 1} total={totalQuestions} />
           </div>
         )}
@@ -173,13 +180,13 @@ const Index = () => {
       </section>
 
       {/* Footer hint */}
-      <footer className="shrink-0 px-5 sm:px-8 pb-5 sm:pb-7 text-center space-y-2">
-        <p className="font-body text-[0.7rem] uppercase tracking-[0.14em] text-muted-foreground/70">
+      <footer className="shrink-0 px-5 sm:px-8 pb-4 sm:pb-5 text-center space-y-1.5">
+        <p className="font-body text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground/70">
           {stage === "intro" && `${TEACHERS.length} teachers · ${totalQuestions} questions · ~2 min`}
           {stage === "quiz" && "Tap an answer to continue"}
           {stage === "calculating" && "Almost there"}
         </p>
-        <p className="font-display text-[0.6rem] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+        <p className="font-display text-[0.55rem] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
           made by <span className="text-primary/70">selvi nisa</span> with ❤️
         </p>
       </footer>
@@ -202,7 +209,7 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicRes
     transition={{ type: "spring", stiffness: 200, damping: 22 }}
     className="w-full max-w-xl mx-auto text-center"
   >
-    <div className="rounded-[2rem] bg-surface border border-border shadow-soft-md p-8 sm:p-12 overflow-y-auto max-h-[85vh]">
+    <div className="rounded-[2rem] bg-surface border border-border shadow-soft-md p-6 sm:p-10 overflow-y-auto max-h-[82vh]">
       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-body text-[0.7rem] font-bold uppercase tracking-[0.14em] mb-5">
         <Sparkles className="w-3 h-3" />
         Mesdio Personality Quiz

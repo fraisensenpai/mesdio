@@ -25,7 +25,7 @@ export const ResultsView = ({ results, onRestart }: Props) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto py-10 sm:py-16 px-5 sm:px-6">
+    <div className="w-full max-w-2xl mx-auto py-6 sm:py-10 px-5 sm:px-6">
       {/* Top match hero */}
       <motion.div
         initial={{ opacity: 0, y: 60, scale: 0.95 }}
