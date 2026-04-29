@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, ArrowRight, Trophy } from "lucide-react";
+import { Sparkles, ArrowRight, Trophy, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { QuizProgress } from "@/components/quiz/QuizProgress";
@@ -22,15 +22,21 @@ const Index = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [scores, setScores] = useState<ScoreMap>({});
   const [userInfo, setUserInfo] = useState({ name: "", surname: "", className: "" });
+  const [mode, setMode] = useState<"M" | "W">("M");
+  const [selectedGrade, setSelectedGrade] = useState<string>("");
+  const [selectedSection, setSelectedSection] = useState<string>("");
   const [publicResults, setPublicResults] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchResults = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("quiz_results")
         .select("*")
-        .order("created_at", { ascending: false })
-        .limit(5);
+        .order("created_at", { ascending: false });
+      
+      // We'll filter by mode in memory or if we add a column, by column.
+      // For now, let's fetch more and filter.
+      const { data, error } = await query.limit(50);
       
       if (data) setPublicResults(data);
       if (error) console.error("Error fetching public results:", error);
@@ -38,6 +44,15 @@ const Index = () => {
 
     fetchResults();
   }, [stage]);
+
+  const filteredPublicResults = useMemo(() => {
+    return publicResults.filter(res => {
+      const section = res.class_name?.split("-")[1] || "";
+      const isM = ["A", "B", "C", "D"].includes(section);
+      const isW = ["E", "F", "G", "H"].includes(section);
+      return mode === "M" ? isM : isW;
+    }).slice(0, 5);
+  }, [publicResults, mode]);
 
 
 
@@ -81,10 +96,11 @@ const Index = () => {
               {
                 name: userInfo.name,
                 surname: userInfo.surname,
-                class_name: userInfo.className,
+                class_name: `${selectedGrade}-${selectedSection}`,
                 top_match: finalResults[0].teacher.name,
                 percentage: finalResults[0].percentage,
                 all_results: finalResults,
+                mode: mode, // Optional: if column exists
               },
             ]);
           } catch (error) {
@@ -163,7 +179,16 @@ const Index = () => {
               totalQuestions={totalQuestions} 
               userInfo={userInfo}
               setUserInfo={setUserInfo}
-              publicResults={publicResults}
+              mode={mode}
+              setMode={(m) => {
+                setMode(m);
+                setSelectedSection(""); // Reset section when mode changes
+              }}
+              selectedGrade={selectedGrade}
+              setSelectedGrade={setSelectedGrade}
+              selectedSection={selectedSection}
+              setSelectedSection={setSelectedSection}
+              publicResults={filteredPublicResults}
             />
 
           )}
@@ -194,11 +219,29 @@ const Index = () => {
   );
 };
 
-const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicResults }: { 
+const IntroScreen = ({ 
+  onStart, 
+  totalQuestions, 
+  userInfo, 
+  setUserInfo, 
+  mode, 
+  setMode, 
+  selectedGrade, 
+  setSelectedGrade, 
+  selectedSection, 
+  setSelectedSection, 
+  publicResults 
+}: { 
   onStart: () => void; 
   totalQuestions: number;
   userInfo: { name: string; surname: string; className: string };
   setUserInfo: (val: any) => void;
+  mode: "M" | "W";
+  setMode: (m: "M" | "W") => void;
+  selectedGrade: string;
+  setSelectedGrade: (g: string) => void;
+  selectedSection: string;
+  setSelectedSection: (s: string) => void;
   publicResults: any[];
 }) => (
   <motion.div
@@ -240,22 +283,63 @@ const IntroScreen = ({ onStart, totalQuestions, userInfo, setUserInfo, publicRes
             onChange={(e) => setUserInfo({ ...userInfo, surname: e.target.value })}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="class" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Class</Label>
-          <Input 
-            id="class" 
-            placeholder="e.g. 9-A" 
-            className="rounded-xl border-border bg-background focus:ring-primary h-12"
-            value={userInfo.className}
-            onChange={(e) => setUserInfo({ ...userInfo, className: e.target.value })}
-          />
+        <div className="space-y-3">
+          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Mode & Class</Label>
+          
+          {/* Mode Selector */}
+          <div className="flex p-1 bg-secondary/50 rounded-xl border border-border">
+            <button
+              onClick={() => setMode("M")}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${mode === "M" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              M Mode (A-D)
+            </button>
+            <button
+              onClick={() => setMode("W")}
+              className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${mode === "W" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              W Mode (E-H)
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {/* Grade Selector */}
+            <div className="space-y-1.5 relative">
+              <select
+                value={selectedGrade}
+                onChange={(e) => setSelectedGrade(e.target.value)}
+                className="w-full h-12 px-4 pr-10 rounded-xl border border-border bg-background text-sm font-medium focus:ring-2 focus:ring-primary outline-none appearance-none cursor-pointer transition-all hover:border-primary/50"
+              >
+                <option value="" disabled>Grade</option>
+                {["Prep", "9", "10", "11", "12"].map(g => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            </div>
+
+            {/* Section Selector */}
+            <div className="space-y-1.5 relative">
+              <select
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                className="w-full h-12 px-4 pr-10 rounded-xl border border-border bg-background text-sm font-medium focus:ring-2 focus:ring-primary outline-none appearance-none cursor-pointer transition-all hover:border-primary/50"
+              >
+                <option value="" disabled>Section</option>
+                {(mode === "M" ? ["A", "B", "C", "D"] : ["E", "F", "G", "H"]).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
 
 
       <button
         onClick={onStart}
-        disabled={!userInfo.name || !userInfo.surname || !userInfo.className}
+        disabled={!userInfo.name || !userInfo.surname || !selectedGrade || !selectedSection}
         className="mt-8 group inline-flex items-center gap-2.5 pl-7 pr-5 py-4 rounded-2xl bg-foreground text-background font-body font-semibold text-base shadow-soft-md hover:shadow-soft-lg active:scale-[0.98] transition-[transform,box-shadow] duration-200 ease-spring disabled:opacity-50 disabled:cursor-not-allowed w-full justify-center"
       >
         Start the quiz

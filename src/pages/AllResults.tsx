@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, User, GraduationCap, School } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 export default function AllResults() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState<"M" | "W">("M");
 
   useEffect(() => {
     const fetchAllResults = async () => {
@@ -23,10 +24,19 @@ export default function AllResults() {
     fetchAllResults();
   }, []);
 
+  const filteredResults = useMemo(() => {
+    return results.filter(res => {
+      const section = res.class_name?.split("-")[1] || "";
+      const isM = ["A", "B", "C", "D"].includes(section);
+      const isW = ["E", "F", "G", "H"].includes(section);
+      return mode === "M" ? isM : isW;
+    });
+  }, [results, mode]);
+
   return (
     <div className="min-h-screen bg-background p-6 sm:p-12">
       <div className="max-w-4xl mx-auto">
-        <header className="mb-10 flex items-center justify-between">
+        <header className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <div>
             <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors mb-4">
               <ArrowLeft className="w-4 h-4" />
@@ -35,10 +45,20 @@ export default function AllResults() {
             <h1 className="font-display text-4xl font-extrabold text-foreground">Global Hall of Fame</h1>
             <p className="text-muted-foreground mt-2">All recorded teacher matches from students worldwide.</p>
           </div>
-          <div className="hidden sm:block">
-            <span className="px-4 py-2 rounded-full bg-primary/10 text-primary font-display font-bold text-sm">
-              {results.length} Matches Found
-            </span>
+          
+          <div className="flex p-1 bg-secondary/50 rounded-xl border border-border self-start">
+            <button
+              onClick={() => setMode("M")}
+              className={`px-6 py-2 text-sm font-bold rounded-lg transition-all ${mode === "M" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              M Results
+            </button>
+            <button
+              onClick={() => setMode("W")}
+              className={`px-6 py-2 text-sm font-bold rounded-lg transition-all ${mode === "W" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              W Results
+            </button>
           </div>
         </header>
 
@@ -48,7 +68,16 @@ export default function AllResults() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {results.map((res) => (
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                Showing {mode} Mode Results
+              </span>
+              <span className="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded-md">
+                {filteredResults.length} Matches
+              </span>
+            </div>
+
+            {filteredResults.map((res) => (
               <motion.div
                 key={res.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -94,9 +123,9 @@ export default function AllResults() {
               </motion.div>
             ))}
 
-            {results.length === 0 && (
+            {filteredResults.length === 0 && (
               <div className="text-center py-20 rounded-[2rem] border-2 border-dashed border-border bg-secondary/20">
-                <p className="text-muted-foreground font-display">No matches found yet. Be the first one!</p>
+                <p className="text-muted-foreground font-display">No matches found for {mode} mode yet.</p>
               </div>
             )}
           </div>
