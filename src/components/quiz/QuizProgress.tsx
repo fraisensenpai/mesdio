@@ -6,7 +6,7 @@ type Props = {
 };
 
 export const QuizProgress = ({ current, total }: Props) => {
-  const pct = Math.min(100, Math.max(0, (current / total) * 100));
+  const pct = Math.min(100, Math.max(0, ((current - 1) / total) * 100));
   return (
     <div className="w-full max-w-xl mx-auto">
       <div className="flex items-center justify-between mb-2.5 px-0.5">
