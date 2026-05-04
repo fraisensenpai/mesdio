@@ -43,7 +43,7 @@ const Index = () => {
     };
 
     fetchResults();
-  }, [stage]);
+  }, [stage, mode]);
 
   const filteredPublicResults = useMemo(() => {
     return publicResults.filter(res => {
@@ -92,21 +92,34 @@ const Index = () => {
         // Send to Supabase
         const sendData = async () => {
           try {
-            await supabase.from("quiz_results").insert([
+            const { error } = await supabase.from("quiz_results").insert([
               {
-                name: userInfo.name,
-                surname: userInfo.surname,
+                name: userInfo.name.trim(),
+                surname: userInfo.surname.trim(),
                 class_name: `${selectedGrade}-${selectedSection}`,
                 top_match: finalResults[0].teacher.name,
                 percentage: finalResults[0].percentage,
                 all_results: finalResults,
-                mode: mode, // Optional: if column exists
               },
             ]);
+            
+            if (error) {
+              console.error("Supabase insert error:", error);
+            } else {
+              // Fetch latest results immediately after successful insert
+              // to ensure the user sees themselves when they restart
+              const { data } = await supabase
+                .from("quiz_results")
+                .select("*")
+                .order("created_at", { ascending: false })
+                .limit(50);
+              if (data) setPublicResults(data);
+            }
           } catch (error) {
             console.error("Error sending to Supabase:", error);
           }
         };
+        
         sendData();
 
         window.setTimeout(() => setStage("results"), 1600);
