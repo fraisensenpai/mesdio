@@ -95,6 +95,14 @@ export const TEACHERS: Teacher[] = [
     description: "Kind and peaceful, bringing a sense of harmony to those around her.",
     color: "280 70% 60%",
   },
+  {
+    id: "t_abdurrahman",
+    name: "Abdurrahman İmir",
+    subject: "Teacher",
+    emoji: "🔭",
+    description: "A visionary educator with a sharp mind and a cheerful spirit.",
+    color: "215 80% 55%",
+  },
 ];
 
 // --- Questions --------------------------------------------------------------
@@ -108,7 +116,7 @@ export const QUESTIONS: Question[] = [
     question_text: "The country you most want to visit",
     answers: [
       { id: "q1a1", answer_text: "USA", weights: w({ t_zumrut: 1 }) },
-      { id: "q1a2", answer_text: "Spain", weights: w({ t_hatice: 1, t_aysenur_y: 1 }) },
+      { id: "q1a2", answer_text: "Spain", weights: w({ t_hatice: 1, t_aysenur_y: 1, t_abdurrahman: 1 }) },
       { id: "q1a3", answer_text: "Mecca", weights: w({ t_asia: 1 }) },
       { id: "q1a4", answer_text: "Finland", weights: w({ t_esra: 1 }) },
       { id: "q1a5", answer_text: "Italy", weights: w({ t_funda: 1 }) },
@@ -120,7 +128,7 @@ export const QUESTIONS: Question[] = [
     id: "q2",
     question_text: "What’s your star sign?",
     answers: [
-      { id: "q2a1", answer_text: "Aries", weights: w({ t_asia: 1 }) },
+      { id: "q2a1", answer_text: "Aries", weights: w({ t_asia: 1, t_abdurrahman: 1 }) },
       { id: "q2a2", answer_text: "Taurus", weights: w({ t_aysenur_u: 1 }) },
       { id: "q2a3", answer_text: "Gemini", weights: w({ t_naside: 1 }) },
       { id: "q2a4", answer_text: "Cancer", weights: w({ t_zumrut: 1, t_esra: 1 }) },
@@ -139,7 +147,7 @@ export const QUESTIONS: Question[] = [
     question_text: "If you could be an animal for a day, which animal would you choose?",
     answers: [
       { id: "q3a1", answer_text: "Cat", weights: w({ t_zumrut: 1 }) },
-      { id: "q3a2", answer_text: "Bird", weights: w({ t_asia: 1, t_aysenur_y: 1, t_funda: 1, t_naside: 1 }) },
+      { id: "q3a2", answer_text: "Bird", weights: w({ t_asia: 1, t_aysenur_y: 1, t_funda: 1, t_naside: 1, t_abdurrahman: 1 }) },
       { id: "q3a3", answer_text: "Penguin", weights: w({ t_esra: 1 }) },
       { id: "q3a4", answer_text: "Eagle", weights: w({ t_hatice: 1 }) },
       { id: "q3a5", answer_text: "Flamingo", weights: w({ t_aysenur_u: 1 }) },
@@ -149,7 +157,7 @@ export const QUESTIONS: Question[] = [
     id: "q4",
     question_text: "The type of music you enjoy listening to the most",
     answers: [
-      { id: "q4a1", answer_text: "Pop", weights: w({ t_zumrut: 1, t_aysenur_y: 1, t_funda: 1 }) },
+      { id: "q4a1", answer_text: "Pop", weights: w({ t_zumrut: 1, t_aysenur_y: 1, t_funda: 1, t_abdurrahman: 1 }) },
       { id: "q4a2", answer_text: "Chant", weights: w({ t_asia: 1, t_naside: 1 }) },
       { id: "q4a3", answer_text: "Rock", weights: w({ t_esra: 1, t_aysenur_u: 1 }) },
     ],
@@ -161,7 +169,7 @@ export const QUESTIONS: Question[] = [
       { id: "q5a1", answer_text: "Romantic comedy", weights: w({ t_zumrut: 1 }) },
       { id: "q5a2", answer_text: "Action", weights: w({ t_asia: 1, t_hatice: 1 }) },
       { id: "q5a3", answer_text: "Horror", weights: w({ t_aysenur_y: 1, t_esra: 1 }) },
-      { id: "q5a4", answer_text: "Science fiction", weights: w({ t_funda: 1 }) },
+      { id: "q5a4", answer_text: "Science fiction", weights: w({ t_funda: 1, t_abdurrahman: 1 }) },
       { id: "q5a5", answer_text: "Other", weights: w({ t_naside: 1 }) },
     ],
   },
@@ -175,6 +183,7 @@ export const QUESTIONS: Question[] = [
       { id: "q6a4", answer_text: "Teleportation", weights: w({ t_esra: 1, t_aysenur_u: 1 }) },
       { id: "q6a5", answer_text: "Fly", weights: w({ t_hatice: 1, t_naside: 1 }) },
       { id: "q6a6", answer_text: "Read mind", weights: w({ t_funda: 1 }) },
+      { id: "q6a7", answer_text: "Telekinesis", weights: w({ t_abdurrahman: 1 }) },
     ],
   },
   {
@@ -182,7 +191,7 @@ export const QUESTIONS: Question[] = [
     question_text: "What is your favourite season",
     answers: [
       { id: "q7a1", answer_text: "Summer", weights: w({ t_zumrut: 1, t_hatice: 1 }) },
-      { id: "q7a2", answer_text: "Spring", weights: w({ t_aysenur_y: 1, t_naside: 1 }) },
+      { id: "q7a2", answer_text: "Spring", weights: w({ t_aysenur_y: 1, t_naside: 1, t_abdurrahman: 1 }) },
       { id: "q7a3", answer_text: "Fall", weights: w({ t_asia: 1, t_funda: 1 }) },
       { id: "q7a4", answer_text: "Winter", weights: w({ t_esra: 1, t_aysenur_u: 1 }) },
     ],
@@ -194,7 +203,7 @@ export const QUESTIONS: Question[] = [
       { id: "q8a1", answer_text: "Green", weights: w({ t_zumrut: 1, t_naside: 1 }) },
       { id: "q8a2", answer_text: "Maroon", weights: w({ t_asia: 1 }) },
       { id: "q8a3", answer_text: "Grey", weights: w({ t_aysenur_y: 1 }) },
-      { id: "q8a4", answer_text: "Blue", weights: w({ t_esra: 1 }) },
+      { id: "q8a4", answer_text: "Blue", weights: w({ t_esra: 1, t_abdurrahman: 1 }) },
       { id: "q8a5", answer_text: "Yellow", weights: w({ t_hatice: 1 }) },
       { id: "q8a6", answer_text: "Red", weights: w({ t_funda: 1 }) },
       { id: "q8a7", answer_text: "Dark blue", weights: w({ t_aysenur_u: 1 }) },
@@ -204,7 +213,7 @@ export const QUESTIONS: Question[] = [
     id: "q9",
     question_text: "What is the personality you most often adopt in everyday life?",
     answers: [
-      { id: "q9a1", answer_text: "Cheerful", weights: w({ t_zumrut: 1, t_asia: 1, t_esra: 1, t_funda: 1 }) },
+      { id: "q9a1", answer_text: "Cheerful", weights: w({ t_zumrut: 1, t_asia: 1, t_esra: 1, t_funda: 1, t_abdurrahman: 1 }) },
       { id: "q9a2", answer_text: "Stressful", weights: w({ t_aysenur_y: 1, t_hatice: 1 }) },
       { id: "q9a3", answer_text: "Calm", weights: w({ t_aysenur_u: 1 }) },
       { id: "q9a4", answer_text: "Peaceful", weights: w({ t_naside: 1 }) },
@@ -214,7 +223,7 @@ export const QUESTIONS: Question[] = [
     id: "q10",
     question_text: "Which football team do you support",
     answers: [
-      { id: "q10a1", answer_text: "Galatasaray", weights: w({ t_zumrut: 1, t_aysenur_y: 1, t_aysenur_u: 1 }) },
+      { id: "q10a1", answer_text: "Galatasaray", weights: w({ t_zumrut: 1, t_aysenur_y: 1, t_aysenur_u: 1, t_abdurrahman: 1 }) },
       { id: "q10a2", answer_text: "Beşiktaş", weights: w({ t_hatice: 1 }) },
       { id: "q10a3", answer_text: "Fenerbahçe", weights: w({ t_funda: 1 }) },
       { id: "q10a4", answer_text: "Trabzonspor", weights: w({ t_esra: 1 }) },
