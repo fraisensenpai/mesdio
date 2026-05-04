@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, User, GraduationCap, School } from "lucide-react";
+import { ArrowLeft, User, GraduationCap, School, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export default function AllResults() {
   const [results, setResults] = useState<any[]>([]);
@@ -23,6 +24,25 @@ export default function AllResults() {
 
     fetchAllResults();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("quiz_results")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setResults(prev => prev.filter(res => res.id !== id));
+      toast.success("Record deleted successfully");
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      toast.error("Failed to delete record");
+    }
+  };
 
   const filteredResults = useMemo(() => {
     return results.filter(res => {
@@ -118,6 +138,13 @@ export default function AllResults() {
                         {res.percentage}% Match Rate
                       </p>
                     </div>
+                    <button
+                      onClick={() => handleDelete(res.id)}
+                      className="p-2.5 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all ml-2"
+                      title="Delete record"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </motion.div>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, ArrowRight, Trophy, ChevronDown } from "lucide-react";
+import { Sparkles, ArrowRight, Trophy, ChevronDown, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { QuizProgress } from "@/components/quiz/QuizProgress";
@@ -12,6 +12,7 @@ import { QUESTIONS, TEACHERS, computeResults, type ScoreMap } from "@/data/quiz"
 import { supabase } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 
 type Stage = "intro" | "quiz" | "calculating" | "results";
@@ -132,6 +133,26 @@ const Index = () => {
     }, 380);
   };
 
+  const handleDeleteResult = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("quiz_results")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setPublicResults(prev => prev.filter(res => res.id !== id));
+      toast.success("Record deleted");
+    } catch (error) {
+      console.error("Error deleting record:", error);
+      toast.error("Failed to delete");
+    }
+  };
+
   const handleRestart = () => {
     setStage("intro");
     setScores({});
@@ -202,6 +223,7 @@ const Index = () => {
               selectedSection={selectedSection}
               setSelectedSection={setSelectedSection}
               publicResults={filteredPublicResults}
+              onDeleteResult={handleDeleteResult}
             />
 
           )}
@@ -243,7 +265,8 @@ const IntroScreen = ({
   setSelectedGrade, 
   selectedSection, 
   setSelectedSection, 
-  publicResults 
+  publicResults,
+  onDeleteResult
 }: { 
   onStart: () => void; 
   totalQuestions: number;
@@ -256,6 +279,7 @@ const IntroScreen = ({
   selectedSection: string;
   setSelectedSection: (s: string) => void;
   publicResults: any[];
+  onDeleteResult: (id: string, e: React.MouseEvent) => void;
 }) => (
   <motion.div
     key="intro"
@@ -377,9 +401,18 @@ const IntroScreen = ({
                   <span className="font-display font-bold text-sm text-foreground">{res.name} {res.surname}</span>
                   <span className="font-body text-[0.65rem] text-muted-foreground uppercase tracking-wider">Class {res.class_name}</span>
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="font-display font-extrabold text-primary text-sm">{res.top_match}</span>
-                  <span className="font-body text-[0.65rem] text-muted-foreground">{res.percentage}% Match</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end">
+                    <span className="font-display font-extrabold text-primary text-sm">{res.top_match}</span>
+                    <span className="font-body text-[0.65rem] text-muted-foreground">{res.percentage}% Match</span>
+                  </div>
+                  <button
+                    onClick={(e) => onDeleteResult(res.id, e)}
+                    className="p-1.5 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all"
+                    title="Delete record"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             ))}
