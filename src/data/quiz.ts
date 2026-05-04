@@ -120,12 +120,18 @@ export const QUESTIONS: Question[] = [
     id: "q2",
     question_text: "What’s your star sign?",
     answers: [
-      { id: "q2a1", answer_text: "Cancer", weights: w({ t_zumrut: 1, t_esra: 1 }) },
-      { id: "q2a2", answer_text: "Aries", weights: w({ t_asia: 1, t_funda: 1 }) },
-      { id: "q2a3", answer_text: "Leo", weights: w({ t_aysenur_y: 1 }) },
-      { id: "q2a4", answer_text: "Capricorn", weights: w({ t_hatice: 1 }) },
-      { id: "q2a5", answer_text: "Taurus", weights: w({ t_aysenur_u: 1 }) },
-      { id: "q2a6", answer_text: "Gemini", weights: w({ t_naside: 1 }) },
+      { id: "q2a1", answer_text: "Aries", weights: w({ t_asia: 1 }) },
+      { id: "q2a2", answer_text: "Taurus", weights: w({ t_aysenur_u: 1 }) },
+      { id: "q2a3", answer_text: "Gemini", weights: w({ t_naside: 1 }) },
+      { id: "q2a4", answer_text: "Cancer", weights: w({ t_zumrut: 1, t_esra: 1 }) },
+      { id: "q2a5", answer_text: "Leo", weights: w({ t_aysenur_y: 1 }) },
+      { id: "q2a6", answer_text: "Virgo", weights: w({ t_esra: 1 }) },
+      { id: "q2a7", answer_text: "Libra", weights: w({ t_hatice: 1 }) },
+      { id: "q2a8", answer_text: "Scorpio", weights: w({ t_funda: 1 }) },
+      { id: "q2a9", answer_text: "Sagittarius", weights: w({ t_asia: 1, t_zumrut: 1 }) },
+      { id: "q2a10", answer_text: "Capricorn", weights: w({ t_hatice: 1 }) },
+      { id: "q2a11", answer_text: "Aquarius", weights: w({ t_aysenur_y: 1, t_funda: 1 }) },
+      { id: "q2a12", answer_text: "Pisces", weights: w({ t_naside: 1, t_aysenur_u: 1 }) },
     ],
   },
   {
@@ -175,9 +181,10 @@ export const QUESTIONS: Question[] = [
     id: "q7",
     question_text: "What is your favourite season",
     answers: [
-      { id: "q7a1", answer_text: "Summer", weights: w({ t_zumrut: 1, t_esra: 1, t_hatice: 1, t_funda: 1, t_aysenur_u: 1 }) },
+      { id: "q7a1", answer_text: "Summer", weights: w({ t_zumrut: 1, t_hatice: 1 }) },
       { id: "q7a2", answer_text: "Spring", weights: w({ t_aysenur_y: 1, t_naside: 1 }) },
-      { id: "q7a3", answer_text: "Fall", weights: w({ t_asia: 1 }) },
+      { id: "q7a3", answer_text: "Fall", weights: w({ t_asia: 1, t_funda: 1 }) },
+      { id: "q7a4", answer_text: "Winter", weights: w({ t_esra: 1, t_aysenur_u: 1 }) },
     ],
   },
   {
@@ -227,12 +234,25 @@ export type RankedResult = {
 
 /**
  * Calculate ranked percentage results from collected scores.
+ * Now uses absolute matching: (Teacher Score / Teacher Max Possible Score)
+ * This allows reaching 100% if the user picks all answers associated with a teacher.
  */
 export const computeResults = (scores: ScoreMap): RankedResult[] => {
-  const total = Object.values(scores).reduce((sum, n) => sum + n, 0) || 1;
   return TEACHERS.map((teacher) => {
     const score = scores[teacher.id] ?? 0;
-    const percentage = Math.round((score / total) * 100);
+    
+    // Calculate max possible score for this specific teacher
+    const maxPossible = QUESTIONS.reduce((sum, q) => {
+      const teacherWeights = q.answers.flatMap(a => 
+        a.weights.filter(w => w.teacher_id === teacher.id)
+      );
+      const maxWeightInQuestion = teacherWeights.length > 0 
+        ? Math.max(...teacherWeights.map(w => w.weight)) 
+        : 0;
+      return sum + maxWeightInQuestion;
+    }, 0) || 1;
+
+    const percentage = Math.round((score / maxPossible) * 100);
     return { teacher, score, percentage };
   }).sort((a, b) => b.percentage - a.percentage);
 };
